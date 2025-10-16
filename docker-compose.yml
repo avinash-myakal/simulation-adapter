@@ -1,0 +1,28 @@
+# =========================
+# file: docker-compose.yml
+# =========================
+version: "3.9"
+
+services:
+  energy-sim-adapter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mm/energy-sim:9.4.0-py3.11
+    container_name: energy-sim-adapter
+    env_file:
+      - .env.docker
+    networks:
+      - mmvib-net   # must match the existing network used by aging/registry/minio
+    ports:
+      - "8001:8000"   # optional: host:container for testing; registry uses internal DNS
+    restart: unless-stopped
+    # depends_on can be uncommented if you orchestrate MinIO/registry in the same compose
+    # depends_on:
+    #   - minio
+    #   - mmvib-registry
+
+networks:
+  mmvib-net:
+    external: true  # reuse the same network as your aging model/registry
+
